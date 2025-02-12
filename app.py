@@ -219,10 +219,11 @@ def main():
         st.markdown("---")
         
         st.markdown("### Upload Files")
-        # File upload section - now for survey, template, and historical data
+        # File upload section - now including table template
         template_file = st.file_uploader("Upload PowerPoint Template", type=['pptx'])
         survey_file = st.file_uploader("Upload Survey Data (Excel)", type=['xlsx'])
         historical_file = st.file_uploader("Upload Historical Data (Excel)", type=['xlsx'])
+        table_template_file = st.file_uploader("Upload Table Template (Excel)", type=['xlsx'])
 
     # Main content
     #st.title("📊 Türkiye Raporu - Report Generator")
@@ -233,11 +234,12 @@ def main():
     1. Upload your survey data Excel file (Current)
     2. Upload the PowerPoint template (Previous month's PowerPoint)
     3. Upload the historical data Excel file (Previous month's historical data)
-    4. Click process to generate your report
+    4. Upload the table template Excel file
+    5. Click process to generate your report
     """)
 
     # Process button and results
-    if all([survey_file, template_file, historical_file]):
+    if all([survey_file, template_file, historical_file, table_template_file]):
         st.markdown("---")
         
         if st.button("🚀 Process Data", type="primary"):
@@ -247,6 +249,9 @@ def main():
                 
                 # Save historical file and get its path
                 historical_path = file_handler.save_uploaded_file(historical_file)
+                
+                # Save table template file and get its path
+                table_template_path = file_handler.save_uploaded_file(table_template_file)
                 
                 # Process the data
                 with st.spinner('Processing data...'):
