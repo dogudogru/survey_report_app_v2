@@ -287,9 +287,6 @@ class ChartUpdater:
         historical_df = historical_df.replace([np.inf, -np.inf], 0)
         historical_df = historical_df.fillna(0)
         
-        # Get last 24 months of data
-        last_24_months = historical_df.tail(24)
-        
         # Process each slide and its charts
         for slide_num, parties in PARTY_PAIRS.items():
             slide = self.prs.slides[slide_num - 1]
@@ -307,13 +304,14 @@ class ChartUpdater:
                     chart_data = CategoryChartData()
                     
                     # Use Date as categories with translation
-                    chart_data.categories = self._translate_list(last_24_months['Months'].tolist(), 'dates')
+                    data = historical_df
+                    chart_data.categories = self._translate_list(data['Months'].tolist(), 'dates')
                     
                     # Keep values as percentages (no division by 100)
                     if party == 'Kararsız':
-                        values = last_24_months['Kararsız'].tolist()
+                        values = data['Kararsız'].tolist()
                     else:
-                        values = last_24_months[party].tolist()
+                        values = data[party].tolist()
                     
                     # Convert to float and handle any remaining NaN/INF
                     values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
@@ -346,11 +344,12 @@ class ChartUpdater:
                     chart_data = CategoryChartData()
                     
                     # Use dates from Months column with translation
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    data = df
+                    chart_data.categories = self._translate_list(data['Months'].tolist(), 'dates')
                     
                     # Add each education level as a series with translations
                     for level in ['İlköğretim ve altı', 'Lise', 'Yüksekokul ve üzeri']:
-                        values = df[level].tail(24).tolist()
+                        values = data[level].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(level, 'education'), values)
                     
@@ -383,11 +382,12 @@ class ChartUpdater:
                     chart_data = CategoryChartData()
                     
                     # Use dates from Months column with translation
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    data = df
+                    chart_data.categories = self._translate_list(data['Months'].tolist(), 'dates')
                     
                     # Add each age group as a series with translations
                     for group in ['18-34', '35-54', '55 ve üstü']:
-                        values = df[group].tail(24).tolist()
+                        values = data[group].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(group, 'age'), values)
                     
@@ -407,12 +407,13 @@ class ChartUpdater:
             chart_data = CategoryChartData()
             
             # Use dates from Months column with translation
-            chart_data.categories = self._translate_list(retention_df['Months'].tail(24).tolist(), 'dates')
+            data = retention_df
+            chart_data.categories = self._translate_list(data['Months'].tolist(), 'dates')
             
             # Add series for each party with translations
             parties = ['AK Parti', 'CHP', 'DEM Parti', 'İYİ Parti', 'MHP']
             for party in parties:
-                values = retention_df[party].tail(24).tolist()
+                values = data[party].tolist()
                 # Convert to float and handle any remaining NaN/INF
                 values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                 chart_data.add_series(self._translate(party, 'parties'), values)
@@ -428,10 +429,10 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'econ_main'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     for response in ['Çok kötü / Kötü', 'Ne iyi ne kötü', 'Çok İyi / İyi']:
-                        values = df[response].tail(24).tolist()
+                        values = df[response].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(response, 'economy'), values)
                     
@@ -444,10 +445,10 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'econ_negative_party'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     for party in ['AK Parti', 'CHP', 'DEM Parti', 'İYİ Parti', 'MHP']:
-                        values = df[party].tail(24).tolist()
+                        values = df[party].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(party, 'parties'), values)
                     
@@ -460,10 +461,10 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'econ_negative_age'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     for age_group in ['18-34', '35-54', '55 ve üstü']:
-                        values = df[age_group].tail(24).tolist()
+                        values = df[age_group].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(age_group, 'age'), values)
                     
@@ -476,10 +477,10 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'econ_negative_education'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     for edu_level in ['İlköğretim ve altı', 'Lise', 'Yüksekokul ve üzeri']:
-                        values = df[edu_level].tail(24).tolist()
+                        values = df[edu_level].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(edu_level, 'education'), values)
                     
@@ -492,10 +493,10 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'econ_future_main'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     for response in ['Çok Daha Kötü/Daha Kötü', 'Değişmez', 'Çok Daha İyi/Daha İyi']:
-                        values = df[response].tail(24).tolist()
+                        values = df[response].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(response, 'economy'), values)
                     
@@ -508,10 +509,10 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'econ_future_party'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     for party in ['AK Parti', 'CHP', 'DEM Parti', 'İYİ Parti', 'MHP']:
-                        values = df[party].tail(24).tolist()
+                        values = df[party].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(party, 'parties'), values)
                     
@@ -524,10 +525,10 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'econ_future_age'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     for age_group in ['18-34', '35-54', '55 ve üstü']:
-                        values = df[age_group].tail(24).tolist()
+                        values = df[age_group].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(age_group, 'age'), values)
                     
@@ -580,7 +581,7 @@ class ChartUpdater:
                     print(f"Found 'politician_success_main' chart in slide {slide_num}")
                     chart_found = True
                     chart_data = CategoryChartData()
-                    dates = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    dates = self._translate_list(df['Months'].tolist(), 'dates')
                     print(f"Translated dates: {dates}")
                     chart_data.categories = dates
                     
@@ -588,7 +589,7 @@ class ChartUpdater:
                                      'Ekrem İmamoğlu', 'Mansur Yavaş', 'Fatih Erbakan']:
                         if politician in df.columns:
                             print(f"Processing politician: {politician}")
-                            values = df[politician].tail(24).tolist()
+                            values = df[politician].tolist()
                             # Convert zeros to None instead of 0
                             values = [None if pd.isna(x) or not np.isfinite(x) or x == 0 else float(x) for x in values]
                             translated_name = self._translate(politician, 'politicians')
@@ -622,7 +623,7 @@ class ChartUpdater:
                     print(f"Found 'politician_success_second' chart in slide {slide_num}")
                     chart_found = True
                     chart_data = CategoryChartData()
-                    dates = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    dates = self._translate_list(df['Months'].tolist(), 'dates')
                     print(f"Translated dates: {dates}")
                     chart_data.categories = dates
                     
@@ -630,7 +631,7 @@ class ChartUpdater:
                                      'Tülay Hatimoğulları Oruç', 'Yavuz Ağıralioğlu', 'Mahmut Arıkan']:
                         if politician in df.columns:
                             print(f"Processing politician: {politician}")
-                            values = df[politician].tail(24).tolist()
+                            values = df[politician].tolist()
                             # Convert zeros to None instead of 0
                             values = [None if pd.isna(x) or not np.isfinite(x) or x == 0 else float(x) for x in values]
                             translated_name = self._translate(politician, 'politicians')
@@ -661,7 +662,7 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'subsistence'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     responses = [
                         'Gelirim giderimi karşılamadı.',
@@ -671,7 +672,7 @@ class ChartUpdater:
                     ]
                     
                     for response in responses:
-                        values = df[response].tail(24).tolist()
+                        values = df[response].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(response, 'subsistence'), values)
                     
@@ -684,10 +685,10 @@ class ChartUpdater:
                 chart = next((shape.chart for shape in slide.shapes if shape.has_chart and shape.name == 'subsistence_party'), None)
                 if chart:
                     chart_data = CategoryChartData()
-                    chart_data.categories = self._translate_list(df['Months'].tail(24).tolist(), 'dates')
+                    chart_data.categories = self._translate_list(df['Months'].tolist(), 'dates')
                     
                     for party in ['AK Parti', 'CHP', 'DEM Parti', 'İYİ Parti', 'MHP']:
-                        values = df[party].tail(24).tolist()
+                        values = df[party].tolist()
                         values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                         chart_data.add_series(self._translate(party, 'parties'), values)
                     
