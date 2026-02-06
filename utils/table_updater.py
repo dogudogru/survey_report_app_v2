@@ -260,15 +260,16 @@ class BaseTableUpdater:
         else:
             return f"{self.en_months[current_date.month]}.{str(current_date.year)[2:]}"
     
-    def _round_values(self, value: float) -> int:
-        """Round values to whole numbers between 0 and 100"""
+    def _round_values(self, value: float) -> float:
+        """Round values to one decimal place between 0 and 100"""
         if pd.isna(value) or not np.isfinite(value):
-            return 0
-        return min(max(round(value), 0), 100)
+            return 0.0
+        return min(max(round(value, 1), 0.0), 100.0)
     
     def _update_cell_value(self, worksheet, cell: str, value: float):
         """Update cell with rounded value"""
         worksheet[cell] = self._round_values(value)
+        worksheet[cell].number_format = '0.0'
     
     def _shift_historical_data(self, ws, start_row: int, end_row: int):
         """Shift historical data left by one column (G to K) with proper month translation"""

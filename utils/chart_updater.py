@@ -208,6 +208,15 @@ class ChartUpdater:
             finally:
                 self.prs = None  # Close the presentation regardless of success or failure
 
+    def _apply_chart_number_format(self, chart, number_format: str):
+        """Apply a number format to chart data labels and axis tick labels."""
+        for series in chart.series:
+            if series.data_labels is not None:
+                series.data_labels.number_format = number_format
+
+        if chart.value_axis is not None:
+            chart.value_axis.tick_labels.number_format = number_format
+
     def update_all_charts(self, party_data: Dict[str, float], historical_data: Dict[str, pd.DataFrame]):
         """Update all charts in one go to avoid multiple file operations"""
         print(f"\nUpdating charts for language: {self.language}")
@@ -279,6 +288,7 @@ class ChartUpdater:
         for shape in slide.shapes:
             if shape.has_chart and shape.name == "Chart 1":
                 shape.chart.replace_data(chart_data)
+                self._apply_chart_number_format(shape.chart, '0.0%')
                 break
 
     def _update_time_series_charts(self, historical_df: pd.DataFrame):
@@ -317,6 +327,7 @@ class ChartUpdater:
                     values = [float(0) if pd.isna(x) or not np.isfinite(x) else float(x) for x in values]
                     chart_data.add_series(self._translate(party, 'parties'), values)
                     charts[i].replace_data(chart_data)
+                    self._apply_chart_number_format(charts[i], '0.0')
 
     def _update_education_charts(self, historical_data: Dict[str, pd.DataFrame]):
         """Update education breakdown time series charts"""
@@ -354,6 +365,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(level, 'education'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
                     break
 
     def _update_age_charts(self, historical_data: Dict[str, pd.DataFrame]):
@@ -392,6 +404,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(group, 'age'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
                     break
 
     def _update_2023_party_chart(self, retention_df: pd.DataFrame):
@@ -419,6 +432,7 @@ class ChartUpdater:
                 chart_data.add_series(self._translate(party, 'parties'), values)
             
             chart.replace_data(chart_data)
+            self._apply_chart_number_format(chart, '0.0')
 
     def _update_econ_charts(self, historical_data: Dict[str, pd.DataFrame]):
         """Update all economic charts"""
@@ -437,6 +451,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(response, 'economy'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
         
         # Update economic negative by party chart (Slide 33)
         if 'econ_negative_party' in historical_data:
@@ -453,6 +468,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(party, 'parties'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
         
         # Update economic negative by age chart (Slide 35)
         if 'econ_negative_age' in historical_data:
@@ -469,6 +485,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(age_group, 'age'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
         
         # Update economic negative by education chart (Slide 37)
         if 'econ_negative_education' in historical_data:
@@ -485,6 +502,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(edu_level, 'education'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
 
         # Update main future economic situation chart (Slide 40)
         if 'econ_future_main' in historical_data:
@@ -501,6 +519,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(response, 'economy'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
         
         # Update future economic negative by party chart (Slide 41)
         if 'econ_future_party' in historical_data:
@@ -517,6 +536,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(party, 'parties'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
         
         # Update future economic negative by age chart (Slide 43)
         if 'econ_future_age' in historical_data:
@@ -533,6 +553,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(age_group, 'age'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
 
     def _update_politician_success_charts(self, historical_data: Dict[str, pd.DataFrame], current_success_data: pd.DataFrame):
         """Update all politician success charts"""
@@ -561,6 +582,7 @@ class ChartUpdater:
                 try:
                     print("Attempting to replace chart data...")
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
                     print("Successfully replaced chart data")
                 except Exception as e:
                     print(f"Error replacing chart data: {str(e)}")
@@ -601,6 +623,7 @@ class ChartUpdater:
                     try:
                         print("Attempting to replace chart data...")
                         chart.replace_data(chart_data)
+                        self._apply_chart_number_format(chart, '0.0')
                         print("Successfully replaced chart data")
                     except Exception as e:
                         print(f"Error replacing chart data: {str(e)}")
@@ -643,6 +666,7 @@ class ChartUpdater:
                     try:
                         print("Attempting to replace chart data...")
                         chart.replace_data(chart_data)
+                        self._apply_chart_number_format(chart, '0.0')
                         print("Successfully replaced chart data")
                     except Exception as e:
                         print(f"Error replacing chart data: {str(e)}")
@@ -677,6 +701,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(response, 'subsistence'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
         
         # Update subsistence by party chart (Slide 51)
         if 'subsistence_party' in historical_data:
@@ -693,6 +718,7 @@ class ChartUpdater:
                         chart_data.add_series(self._translate(party, 'parties'), values)
                     
                     chart.replace_data(chart_data)
+                    self._apply_chart_number_format(chart, '0.0')
 
     def _prepare_sorted_data(self, party_data: pd.DataFrame) -> pd.DataFrame:
         """Prepare sorted data with 'Diğer' always at the bottom"""
